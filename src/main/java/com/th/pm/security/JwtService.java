@@ -1,4 +1,4 @@
-package com.th.pm.auth;
+package com.th.pm.security;
 
 
 import java.time.Instant;
@@ -39,7 +39,7 @@ public class JwtService {
                     .compact();
     }
 
-    private Claims extractAllClaims(String jwtToken){
+    public Claims extractAllClaims(String jwtToken){
         try{
             return Jwts
                         .parser()
@@ -59,10 +59,16 @@ public class JwtService {
     }
 
     public Date getExpiration(String token){
+        if (token == null) {
+            return null;
+        }
         return extractClaim(token, Claims::getExpiration);
     }
     
     public String getSubject(String token){
+        if(token == null){
+            return null;
+        }
         return extractClaim(token, Claims::getSubject);
     }
 
