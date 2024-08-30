@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.th.pm.model.User;
 import io.jsonwebtoken.Claims;
@@ -78,7 +79,15 @@ public class JwtService {
         return now.before(expiration);
     }
 
-    public boolean isTokenValid(String token, User user){
-        return !isTokenExpired(token) && user.getId().toString().equals(getSubject(token));
+    private String getEmail(String token){
+        if(token == null){
+            return null;
+        }
+        Claims claims = extractAllClaims(token);
+        return claims.get("email").toString();
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails){
+        return !isTokenExpired(token) && userDetails.getUsername().toString().equals(getEmail(token));
     }
 }
