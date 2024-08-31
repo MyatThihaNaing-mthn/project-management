@@ -20,7 +20,6 @@ import com.th.pm.repository.CommentRepository;
 import com.th.pm.repository.TaskRepository;
 import com.th.pm.repository.UserRepository;
 import com.th.pm.service.CommentService;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -37,7 +36,11 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public CommentDto createComment(CommentRequest request, String userId, String taskId) {
         Task task = validateTask(taskId);
-        User user = validateUserForComment(userId, task);
+        User user = validateUserForComment(userId);
+        if(!task.getUsers().contains(user)){
+            log.error("Unauthoirzed operation to comment by user"+userId);
+            throw new AccessDeniedException("You are not authorized to perform this operation");
+        }
         Comment comment = new Comment();
         comment.setContent(request.getContent());
         comment.setCreatedAt(Instant.now());
@@ -58,8 +61,17 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     public void deleteComment(String commentId, String userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteComment'");
+        validateUserForComment(userId);
+        Comment comment = validateComment(commentId);
+        try{
+            commentRepository.delete(comment);
+        }catch(DataIntegrityViolationException e){
+            log.info("Data Integrity Violation exception while deleting comment", e);
+            throw new DatabaseException("Data Integrity Violation exception while deleting comment", e);
+        }catch(JpaSystemException e){
+            log.info("Jpa system exception while delting comment", e);
+            throw new DatabaseException("Jpa system exception while deleting comment", e);
+        }
     }
 
     private Task validateTask(String taskId){
@@ -71,15 +83,19 @@ public class CommentServiceImpl implements CommentService{
         throw new EntityNotFoundException("Task not found with id "+taskId);
     }
 
-    private User validateUserForComment(String userId, Task task){
+    private Comment validateComment(String commentId){
+        Optional<Comment> comment = commentRepository.findById(UUID.fromString(commentId));
+        if(comment.isPresent()){
+            return comment.get();
+        }
+        throw new EntityNotFoundException("Comment not foun with id "+commentId);
+    }
+
+    private User validateUserForComment(String userId){
         Optional<User> user = userRepository.findById(UUID.fromString(userId));
         if(!user.isPresent()){
             log.error("User not found with id"+userId);
             throw new EntityNotFoundException("User not found with id "+userId);
-        }
-        if(!task.getUsers().contains(user.get())){
-            log.error("You are not authorized to comment on this task"+task.getId());
-            throw new AccessDeniedException("You are not authorized to comment on this task");
         }
         return user.get();
     }
