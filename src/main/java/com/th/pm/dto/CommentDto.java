@@ -2,6 +2,7 @@ package com.th.pm.dto;
 
 import lombok.Data;
 import java.time.Instant;
+import java.util.List;
 
 @Data
 public class CommentDto {
@@ -10,4 +11,6 @@ public class CommentDto {
     private UserDto postedBy;
     private Instant createdAt;
     private TaskDto taskBelonged;
+    private CommentDto parentComment;
+    private List<CommentDto> replies;
 }

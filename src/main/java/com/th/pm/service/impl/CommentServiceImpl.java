@@ -5,6 +5,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 import java.time.Instant;
@@ -44,12 +46,14 @@ public class CommentServiceImpl implements CommentService{
         Comment comment = new Comment();
         comment.setContent(request.getContent());
         comment.setCreatedAt(Instant.now());
+        comment.setParentComment(null);
+        comment.setReplies(new ArrayList<Comment>());
         comment.setPostedBy(user);
         comment.setTask(task);
 
         try{
             Comment savedComment = commentRepository.save(comment);
-            return DtoMapper.mapTCommentDto(savedComment);
+            return DtoMapper.mapToCommentDto(savedComment);
         }catch(DataIntegrityViolationException e){
             log.info("Data Integrity Violation exception while saving project entity", e);
             throw new DatabaseException("Data Integrity Violation exception while saving project entity", e);

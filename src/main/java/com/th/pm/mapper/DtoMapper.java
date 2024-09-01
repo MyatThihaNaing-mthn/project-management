@@ -24,18 +24,48 @@ public class DtoMapper {
 
     public static TaskDto mapToTaskDto(Task task){
         TaskDto taskDto = new TaskDto();
+        taskDto.setId(task.getId().toString());
+        taskDto.setTitle(task.getTitle());
+        taskDto.setContent(task.getContent());
+        taskDto.setCreatedBy(mapToUserDto(task.getCreatedBy()));
+        taskDto.setDeadline(task.getDeadline());
+        taskDto.setProjectBelonged(mapToProjectDto(task.getProject()));
+        taskDto.setAssignees(task.getUsers().stream().map(user -> DtoMapper.mapToUserDto(user)).collect(Collectors.toSet()));
 
         return taskDto;
     }
 
     public static ProjectDto mapToProjectDto(Project project){
         ProjectDto projectDto = new ProjectDto();
-        
+        projectDto.setId(project.getId().toString());
+        projectDto.setTitle(project.getTitle());
+        projectDto.setCreatedBy(mapToUserDto(project.getCreatedBy()));
+        projectDto.setMembers(project.getMembers().stream().map(member -> DtoMapper.mapToUserDto(member)).collect(Collectors.toSet()));
+        projectDto.setTasks(project.getTasks().stream().map(task -> DtoMapper.mapToTaskDto(task)).collect(Collectors.toSet()));
+
         return projectDto;
     }
 
-    public static CommentDto mapTCommentDto(Comment comment){
+    public static CommentDto mapToCommentDto(Comment comment){
         CommentDto commentDto = new CommentDto();
+        commentDto.setId(comment.getId().toString());
+        commentDto.setContent(comment.getContent());
+        commentDto.setCreatedAt(comment.getCreatedAt());
+        commentDto.setPostedBy(mapToUserDto(comment.getPostedBy()));
+        
+        if(comment.getParentComment() != null){
+            commentDto.setParentComment(mapToCommentDto(comment.getParentComment()));
+        }
+
+        if (comment.getTask() != null) {
+            commentDto.setTaskBelonged(mapToTaskDto(comment.getTask()));
+        }
+
+        if (comment.getReplies() != null) {
+            commentDto.setReplies(comment.getReplies().stream()
+                .map(DtoMapper::mapToCommentDto)
+                .collect(Collectors.toList()));
+        }
 
         return commentDto;
     }
