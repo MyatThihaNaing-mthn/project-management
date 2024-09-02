@@ -27,6 +27,8 @@ public class DtoMapper {
         taskDto.setId(task.getId().toString());
         taskDto.setTitle(task.getTitle());
         taskDto.setContent(task.getContent());
+        taskDto.setStatus(task.getStatus().toString());
+        taskDto.setPriority(task.getStatus().toString());
         taskDto.setCreatedBy(mapToUserDto(task.getCreatedBy()));
         taskDto.setDeadline(task.getDeadline());
         taskDto.setProjectBelonged(mapToProjectDto(task.getProject()));
@@ -39,6 +41,7 @@ public class DtoMapper {
         ProjectDto projectDto = new ProjectDto();
         projectDto.setId(project.getId().toString());
         projectDto.setTitle(project.getTitle());
+        projectDto.setStatus(project.getStatus().toString());
         projectDto.setCreatedBy(mapToUserDto(project.getCreatedBy()));
         projectDto.setMembers(project.getMembers().stream().map(member -> DtoMapper.mapToUserDto(member)).collect(Collectors.toSet()));
         projectDto.setTasks(project.getTasks().stream().map(task -> DtoMapper.mapToTaskDto(task)).collect(Collectors.toSet()));

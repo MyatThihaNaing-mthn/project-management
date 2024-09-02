@@ -8,4 +8,6 @@ public class TaskRequest {
    private String title;
    private String content;
    private LocalDate deadline;
+   private String status;
+   private String priority;
 }

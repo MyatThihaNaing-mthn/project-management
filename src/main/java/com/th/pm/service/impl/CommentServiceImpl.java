@@ -78,6 +78,35 @@ public class CommentServiceImpl implements CommentService{
         }
     }
 
+    @Override
+    public CommentDto createReply(CommentRequest request, String userId, String commentId) {
+        Comment parentComment = validateComment(commentId);
+        User user = validateUserForComment(userId);
+        Task task = validateTask(parentComment.getTask().getId().toString());
+        if(!task.getUsers().contains(user)){
+            log.error("Access denied for user "+userId+ "to comment on"+ commentId);
+            throw new AccessDeniedException("You are not authorized to comment");
+        }
+        Comment replyComment = new Comment();
+        replyComment.setContent(request.getContent());
+        replyComment.setCreatedAt(Instant.now());
+        replyComment.setParentComment(parentComment);
+        replyComment.setPostedBy(user);
+        replyComment.setReplies(new ArrayList<Comment>());
+        replyComment.setTask(task);
+
+        try{
+            Comment reply = commentRepository.save(replyComment);
+            return DtoMapper.mapToCommentDto(reply);
+        }catch(DataIntegrityViolationException e){
+            log.info("Data Integrity Violation exception while creating reply", e);
+            throw new DatabaseException("Data Integrity Violation exception while creating reply", e);
+        }catch(JpaSystemException e){
+            log.info("Jpa system exception while creating reply", e);
+            throw new DatabaseException("Jpa system exception while creating reply", e);
+        }
+    }
+
     private Task validateTask(String taskId){
         Optional<Task> task = taskRepository.findById(UUID.fromString(taskId));
         if(task.isPresent()){

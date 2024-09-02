@@ -1,16 +1,17 @@
 package com.th.pm.service.impl;
 
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
+import com.th.pm.constant.Status;
 import com.th.pm.dto.ProjectDto;
 import com.th.pm.dto.ProjectRequest;
 import com.th.pm.exceptions.DatabaseException;
@@ -46,6 +47,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         project.setCreatedBy(user.get());
+        project.setStatus(Status.CREATED);
         project.setMembers(new HashSet<User>());
         project.setTasks(new ArrayList<Task>());
         

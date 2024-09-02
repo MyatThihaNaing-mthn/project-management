@@ -7,9 +7,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.time.LocalDate; 
 import org.hibernate.annotations.CreationTimestamp;
+import com.th.pm.constant.Priority;
+import com.th.pm.constant.Status;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -36,6 +41,14 @@ public class Task {
 
     @Column(name = "deadline")
     private LocalDate deadline;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Status status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority", nullable = false)
+    private Priority priority;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false, updatable = false)

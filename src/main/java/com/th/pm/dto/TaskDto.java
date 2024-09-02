@@ -11,6 +11,8 @@ public class TaskDto {
     private String title;
     private String content;
     private LocalDate deadline;
+    private String status;
+    private String priority;
     private UserDto createdBy;
     private ProjectDto projectBelonged;
     private Set<UserDto> assignees;

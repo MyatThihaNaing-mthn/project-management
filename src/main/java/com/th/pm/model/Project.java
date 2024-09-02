@@ -1,15 +1,19 @@
 package com.th.pm.model;
 
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import org.hibernate.annotations.CreationTimestamp;
+
+import com.th.pm.constant.Status;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,6 +35,10 @@ public class Project {
 
     @Column(name = "title", nullable = false)
     private String title;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Status status;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
