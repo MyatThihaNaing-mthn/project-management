@@ -2,11 +2,14 @@ package com.th.pm.service.impl;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.th.pm.dto.UserDto;
 import com.th.pm.dto.UserRegister;
+import com.th.pm.exceptions.EntityNotFoundException;
 import com.th.pm.mapper.DtoMapper;
 import com.th.pm.model.Project;
 import com.th.pm.model.Task;
@@ -41,5 +44,20 @@ public class UserServiceImpl implements UserService {
 
         return DtoMapper.mapToUserDto(savedUser);
     }
-    
+
+    @Override
+    public UserDto findUserByEmail(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if(!user.isPresent()){
+            throw new EntityNotFoundException("User not found with email "+email);
+        }
+        return DtoMapper.mapToUserDto(user.get());
+    }
+
+    @Override
+    public User findUserByEmailForAuth(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        return user;
+    }
+
 }

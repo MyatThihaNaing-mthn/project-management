@@ -28,8 +28,8 @@ public class JwtService {
     }
 
 
-    public String generateToken(User user, Long tokenLifeTime){
-        Instant tokenExpiration = Instant.now().plusMillis(tokenLifeTime);
+    public String generateToken(User user){
+        Instant tokenExpiration = Instant.now().plusMillis(tokenLifeTimeInMillis);
         return Jwts
                     .builder()
                     .claim("email", user.getEmail())
