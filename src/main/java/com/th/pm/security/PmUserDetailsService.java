@@ -12,7 +12,10 @@ import com.th.pm.exceptions.EntityNotFoundException;
 import com.th.pm.model.User;
 import com.th.pm.repository.UserRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class PmUserDetailsService implements UserDetailsService{
     @Autowired
     private UserRepository userRepository;
@@ -26,13 +29,13 @@ public class PmUserDetailsService implements UserDetailsService{
         throw new UsernameNotFoundException("username not found "+username);
     }
 
-    public UserDetails loadUserByEmail(String email) throws EntityNotFoundException {
+    public UserDetailsImpl loadUserByEmail(String email) throws EntityNotFoundException {
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isPresent()){
             return new UserDetailsImpl(user.get());
         }
         throw new EntityNotFoundException("User not found with email of "+email);
-        
+       
     }
     
 }

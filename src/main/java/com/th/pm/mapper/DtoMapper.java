@@ -17,8 +17,6 @@ public class DtoMapper {
         String username = String.format("%s %s", user.getFirstname(), user.getLastname());
         userDto.setUsername(username);
         userDto.setEmail(user.getEmail());
-        userDto.setProjectsBelonged(user.getProjects().stream().map(project-> DtoMapper.mapToProjectDto(project)).collect(Collectors.toSet()));
-        userDto.setTasksAssigned(user.getTasks().stream().map(task -> DtoMapper.mapToTaskDto(task)).collect(Collectors.toSet()));
         return userDto;
     }
 

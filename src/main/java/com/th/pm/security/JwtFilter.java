@@ -47,7 +47,7 @@ public class JwtFilter extends OncePerRequestFilter{
             String email = claims.get("email").toString();
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if(email !=null && authentication == null ){
-                UserDetails userDetails = pmUserDetailsService.loadUserByEmail(email);
+                UserDetailsImpl userDetails = pmUserDetailsService.loadUserByEmail(email);
                 if(jwtService.isTokenValid(token, userDetails)){
                     Authentication auth = new UsernamePasswordAuthenticationToken(userDetails,"", userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(auth);
@@ -57,6 +57,7 @@ public class JwtFilter extends OncePerRequestFilter{
             log.error("Error validating jwt token", e);
             handlerExceptionResolver.resolveException(request, response, authHeader, e);
         }
+        filterChain.doFilter(request, response);
     }
     
 }

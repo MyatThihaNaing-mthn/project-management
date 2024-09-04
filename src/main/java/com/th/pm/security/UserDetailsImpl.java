@@ -33,5 +33,9 @@ public class UserDetailsImpl implements UserDetails{
     public String getEmail(){
         return user.getEmail();
     }
-    
+
+    public String getId(){
+        return user.getId().toString();
+    }
+   
 }

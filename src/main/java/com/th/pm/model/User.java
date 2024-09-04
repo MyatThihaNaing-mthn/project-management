@@ -14,22 +14,28 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
 @Table(name = "users")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
     @Id
     @GeneratedValue
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @Column(name = "first_name", nullable = false)
+    @EqualsAndHashCode.Include
     private String firstname;
 
     @Column(name = "last_name", nullable = false)
+    @EqualsAndHashCode.Include
     private String lastname;
 
     @Column(name = "email", nullable = false, unique = true)
+    @EqualsAndHashCode.Include
     private String email;
 
     @Column(name = "password", nullable = false)

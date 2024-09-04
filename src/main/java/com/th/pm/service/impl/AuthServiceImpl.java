@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import com.th.pm.dto.LogInRequest;
 import com.th.pm.dto.LoginResponse;
 import com.th.pm.mapper.DtoMapper;
@@ -15,6 +16,7 @@ import com.th.pm.security.JwtService;
 import com.th.pm.service.AuthService;
 import com.th.pm.service.UserService;
 
+@Service
 public class AuthServiceImpl implements AuthService{
     @Autowired
     private JwtService jwtService;

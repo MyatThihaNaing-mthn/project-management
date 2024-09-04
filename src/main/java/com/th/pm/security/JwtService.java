@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import com.th.pm.model.User;
 import io.jsonwebtoken.Claims;
@@ -44,7 +43,7 @@ public class JwtService {
         try{
             return Jwts
                         .parser()
-                        .decryptWith(getSigningKey())
+                        .verifyWith(getSigningKey())
                         .build()
                         .parseSignedClaims(jwtToken)
                         .getPayload();
@@ -76,7 +75,7 @@ public class JwtService {
     private boolean isTokenExpired(String token){
         Date now = Date.from(Instant.now());
         Date expiration = getExpiration(token);
-        return now.before(expiration);
+        return now.after(expiration);
     }
 
     private String getEmail(String token){
@@ -87,7 +86,8 @@ public class JwtService {
         return claims.get("email").toString();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails){
-        return !isTokenExpired(token) && userDetails.getUsername().toString().equals(getEmail(token));
+    public boolean isTokenValid(String token, UserDetailsImpl userDetails){
+        
+        return !isTokenExpired(token) && userDetails.getEmail().equals(getEmail(token));
     }
 }
