@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
-
 import com.th.pm.constant.Status;
 import com.th.pm.dto.ProjectDto;
 import com.th.pm.dto.ProjectRequest;
+import com.th.pm.dto.ProjectStatus;
 import com.th.pm.exceptions.DatabaseException;
 import com.th.pm.exceptions.EntityNotFoundException;
 import com.th.pm.mapper.DtoMapper;
@@ -73,6 +73,20 @@ public class ProjectServiceImpl implements ProjectService {
         
     }
 
+    @Override
+    public ProjectDto updateProjectStatus(ProjectStatus status) {
+        String projectId = status.getProjectId();
+        Project project = projectRepository.findById(UUID.fromString(projectId)).orElseThrow();
+        Status projectStatus = Status.valueOf(status.getStatus());
+        project.setStatus(projectStatus);
+        Project savedProject = projectRepository.save(project);
+        return DtoMapper.mapToProjectDto(savedProject);
+    }
 
-    
+    @Override
+    public ProjectDto findProjectById(String id) {
+        Project project = projectRepository.findById(UUID.fromString(id)).orElseThrow();
+        return DtoMapper.mapToProjectDto(project);
+    }
+
 }

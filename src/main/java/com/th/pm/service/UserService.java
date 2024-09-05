@@ -8,4 +8,5 @@ public interface UserService {
     UserDto createUser(UserRegister userRegister);
     UserDto findUserByEmail(String email);
     User findUserByEmailForAuth(String email);
+    UserDto findUserById(String id);
 }

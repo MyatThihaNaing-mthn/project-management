@@ -3,6 +3,7 @@ package com.th.pm.service.impl;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,6 +59,12 @@ public class UserServiceImpl implements UserService {
     public User findUserByEmailForAuth(String email) {
         User user = userRepository.findByEmail(email).orElseThrow();
         return user;
+    }
+
+    @Override
+    public UserDto findUserById(String id){
+        User user = userRepository.findById(UUID.fromString(id)).orElseThrow();
+        return DtoMapper.mapToUserDto(user);
     }
 
 }
