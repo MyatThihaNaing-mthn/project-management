@@ -21,7 +21,8 @@ public class JwtService {
     private String secretKey;
     @Value("${jwt.expiration}")
     private Long tokenLifeTimeInMillis;
-
+    @Value("${jwt.refresh-token.expiration}")
+    private Long refreshTokenLifeTimeInMillis;
     private SecretKey getSigningKey(){
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
@@ -37,6 +38,18 @@ public class JwtService {
                     .expiration(Date.from(tokenExpiration))
                     .signWith(getSigningKey(), Jwts.SIG.HS256)
                     .compact();
+    }
+
+    public String generateRefreshToken(User user){
+        Instant tokenExpiration = Instant.now().plusMillis(refreshTokenLifeTimeInMillis);
+        return Jwts
+                    .builder()
+                    .claim("email", user.getEmail())
+                    .subject(user.getId().toString())
+                    .issuedAt(Date.from(Instant.now()))
+                    .expiration(Date.from(tokenExpiration))
+                    .signWith(getSigningKey(), Jwts.SIG.HS256)
+                    .compact(); 
     }
 
     public Claims extractAllClaims(String jwtToken){
