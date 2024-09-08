@@ -5,4 +5,5 @@ import com.th.pm.dto.LoginResponse;
 
 public interface AuthService {
     LoginResponse performLogin(LogInRequest request);
+    LoginResponse refreshAccessToken(String refreshToken);
 }

@@ -12,6 +12,7 @@ import com.th.pm.dto.LogInRequest;
 import com.th.pm.dto.LoginResponse;
 import com.th.pm.mapper.DtoMapper;
 import com.th.pm.model.User;
+import com.th.pm.repository.TokenRepository;
 import com.th.pm.security.JwtService;
 import com.th.pm.service.AuthService;
 import com.th.pm.service.UserService;
@@ -24,6 +25,8 @@ public class AuthServiceImpl implements AuthService{
     private AuthenticationManager authenticationManager;
     @Autowired
     private UserService userService;
+    @Autowired
+    private TokenRepository tokenRepository;
 
 
     @Override
@@ -53,8 +56,21 @@ public class AuthServiceImpl implements AuthService{
         return authentication;
     }
 
+
     private void setAuthentication(Authentication authentication){
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    @Override
+    public LoginResponse refreshAccessToken(String refreshToken) {
+        User user = tokenRepository.findUserByToken(refreshToken).orElseThrow();
+        String accessToken = jwtService.generateRefreshToken(user);
+
+        LoginResponse response = new LoginResponse();
+        response.setAccessToken(accessToken);
+        response.setUser(DtoMapper.mapToUserDto(user));
+
+        return response;
     }
 
     
