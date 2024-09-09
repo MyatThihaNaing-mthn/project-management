@@ -9,7 +9,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
-
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,7 +33,8 @@ public class JwtFilter extends OncePerRequestFilter{
         @SuppressWarnings("null") FilterChain filterChain)
             throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
-
+        
+        log.info("Inside jwt filter");
         if(authHeader == null || !authHeader.startsWith("Bearer")){
             log.warn("Authorization header is missing or does not start with Bearer");
             filterChain.doFilter(request, response);

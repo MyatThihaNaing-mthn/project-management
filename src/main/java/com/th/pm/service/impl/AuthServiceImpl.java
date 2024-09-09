@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import com.th.pm.dto.LogInRequest;
 import com.th.pm.dto.LoginResponse;
 import com.th.pm.mapper.DtoMapper;
+import com.th.pm.model.Token;
 import com.th.pm.model.User;
 import com.th.pm.repository.TokenRepository;
+import com.th.pm.repository.UserRepository;
 import com.th.pm.security.JwtService;
 import com.th.pm.service.AuthService;
 import com.th.pm.service.UserService;
@@ -27,6 +29,8 @@ public class AuthServiceImpl implements AuthService{
     private UserService userService;
     @Autowired
     private TokenRepository tokenRepository;
+    @Autowired
+    private UserRepository userRepository;
 
 
     @Override
@@ -37,6 +41,8 @@ public class AuthServiceImpl implements AuthService{
 
         User user = userService.findUserByEmailForAuth(request.getEmail());
         String token = jwtService.generateToken(user);
+
+        //TOO to save refresh token 
         
         response.setAccessToken(token);
         response.setUser(DtoMapper.mapToUserDto(user));
@@ -63,14 +69,22 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public LoginResponse refreshAccessToken(String refreshToken) {
-        User user = tokenRepository.findUserByToken(refreshToken).orElseThrow();
-        String accessToken = jwtService.generateRefreshToken(user);
+        Token token = tokenRepository.findByToken(refreshToken).orElseThrow();
+        String accessToken = jwtService.generateRefreshToken(token.getUser());
 
         LoginResponse response = new LoginResponse();
         response.setAccessToken(accessToken);
-        response.setUser(DtoMapper.mapToUserDto(user));
+        response.setUser(DtoMapper.mapToUserDto(token.getUser()));
 
         return response;
+    }
+
+    @Override
+    public String generateRefreshToken(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        String refreshToken = jwtService.generateRefreshToken(user);
+        
+        return refreshToken;
     }
 
     

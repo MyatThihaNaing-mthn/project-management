@@ -46,3 +46,5 @@ public class Comment {
     @OneToMany(mappedBy = "parentComment")
     private List<Comment> replies;
 }
+
+//TODO add notification model

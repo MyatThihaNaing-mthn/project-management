@@ -20,8 +20,10 @@ import com.th.pm.validator.ObjectValidator;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     @Autowired
@@ -42,16 +44,20 @@ public class AuthController {
 
     @PostMapping("/user/login")
     ResponseEntity<LoginResponse> loginUser(
-        @RequestBody LogInRequest request
+        @RequestBody LogInRequest request,
+        HttpServletResponse servletResponse
     ){
         //TODO validation for login
         LoginResponse response = authService.performLogin(request);
+        String refreshToken = authService.generateRefreshToken(request.getEmail());
+        setRefreshTokenOnResponse( servletResponse, refreshToken);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/refresh-toknen")
+    @GetMapping("/refresh-token")
     ResponseEntity<LoginResponse> refreshAccessToken(HttpServletRequest request,
     HttpServletResponse response){
+        log.info("Inside refresh endpoint");
         String refreshToken = getRefreshTokenFromRequest(request);
         LoginResponse loginResponse = authService.refreshAccessToken(refreshToken);
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
@@ -68,5 +74,16 @@ public class AuthController {
                 }
             }
         }
+        log.info(refreshToken);
         return refreshToken;
+    }
+
+    private void setRefreshTokenOnResponse(HttpServletResponse response, String refreshToken){
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+    }
+        
 }

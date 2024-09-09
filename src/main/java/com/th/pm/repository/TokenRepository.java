@@ -4,10 +4,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.th.pm.model.Token;
-import com.th.pm.model.User;
 
+@Repository
 public interface TokenRepository extends JpaRepository<Token, UUID>{
-    Optional<User> findUserByToken(String token);
+    Optional<Token> findByToken(String token);
 }
