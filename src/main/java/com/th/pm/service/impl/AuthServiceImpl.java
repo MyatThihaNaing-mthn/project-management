@@ -1,6 +1,8 @@
 package com.th.pm.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,7 +11,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.th.pm.dto.LogInRequest;
-import com.th.pm.dto.LoginResponse;
+import com.th.pm.dto.LoginResult;
+import com.th.pm.exceptions.DatabaseException;
 import com.th.pm.mapper.DtoMapper;
 import com.th.pm.model.Token;
 import com.th.pm.model.User;
@@ -34,20 +37,28 @@ public class AuthServiceImpl implements AuthService{
 
 
     @Override
-    public LoginResponse performLogin(LogInRequest request) {
+    public LoginResult performLogin(LogInRequest request) {
         setAuthentication(authenticate(request.getEmail(), request.getPassword()));
 
-        LoginResponse response = new LoginResponse();
+        LoginResult result = new LoginResult();
 
         User user = userService.findUserByEmailForAuth(request.getEmail());
-        String token = jwtService.generateToken(user);
+        String accesstoken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
-        //TOO to save refresh token 
+        Token token = new Token();
+        token.setToken(refreshToken);
+        token.setUser(user);
+
+        user.addToken(token);
+
+        userRepository.save(user);
         
-        response.setAccessToken(token);
-        response.setUser(DtoMapper.mapToUserDto(user));
+        result.setAccessToken(accesstoken);
+        result.setRefreshToken(refreshToken);
+        result.setUser(DtoMapper.mapToUserDto(user));
 
-        return response;
+        return result;
     }
 
     private Authentication authenticate(String email, String password){
@@ -68,22 +79,44 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public LoginResponse refreshAccessToken(String refreshToken) {
+    public LoginResult refreshAccessToken(String refreshToken) {
         Token token = tokenRepository.findByToken(refreshToken).orElseThrow();
+        User user = token.getUser();
+
         String accessToken = jwtService.generateRefreshToken(token.getUser());
+        String newRefreshToken = jwtService.generateRefreshToken(token.getUser());
 
-        LoginResponse response = new LoginResponse();
-        response.setAccessToken(accessToken);
-        response.setUser(DtoMapper.mapToUserDto(token.getUser()));
+        Token newToken = new Token();
+        newToken.setToken(newRefreshToken);
+        newToken.setUser(user);
 
-        return response;
+        user.removeToken(token);
+        user.addToken(newToken);
+        User savedUser = userRepository.save(user);
+
+        LoginResult result = new LoginResult();
+        result.setAccessToken(accessToken);
+        result.setRefreshToken(newRefreshToken);
+        result.setUser(DtoMapper.mapToUserDto(savedUser));
+
+        return result;
     }
 
     @Override
     public String generateRefreshToken(String email) {
         User user = userRepository.findByEmail(email).orElseThrow();
         String refreshToken = jwtService.generateRefreshToken(user);
-        
+        Token token = new Token();
+        token.setToken(refreshToken);
+        token.setUser(user);
+        try{
+            tokenRepository.save(token);
+            
+        }catch(DataIntegrityViolationException e){
+            throw new DataIntegrityViolationException("Data integrity violation while saving token");
+        }catch(JpaSystemException e){
+            throw new DatabaseException("Jpa Exception while saving token");
+        }
         return refreshToken;
     }
 

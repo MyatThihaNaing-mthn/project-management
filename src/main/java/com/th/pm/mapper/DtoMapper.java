@@ -4,10 +4,12 @@ import java.util.stream.Collectors;
 import com.th.pm.dto.CommentDto;
 import com.th.pm.dto.ProjectDto;
 import com.th.pm.dto.TaskDto;
+import com.th.pm.dto.TokenDto;
 import com.th.pm.dto.UserDto;
 import com.th.pm.model.Comment;
 import com.th.pm.model.Project;
 import com.th.pm.model.Task;
+import com.th.pm.model.Token;
 import com.th.pm.model.User;
 
 public class DtoMapper {
@@ -69,5 +71,14 @@ public class DtoMapper {
         }
 
         return commentDto;
+    }
+
+    public static TokenDto mapToTokenDto(Token token){
+        TokenDto dto = new TokenDto();
+        dto.setId(token.getId().toString());
+        dto.setToken(token.getToken());
+        dto.setUser(DtoMapper.mapToUserDto(token.getUser()));
+        
+        return dto;
     }
 }

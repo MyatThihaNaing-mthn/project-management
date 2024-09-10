@@ -1,10 +1,10 @@
 package com.th.pm.service;
 
 import com.th.pm.dto.LogInRequest;
-import com.th.pm.dto.LoginResponse;
+import com.th.pm.dto.LoginResult;
 
 public interface AuthService {
-    LoginResponse performLogin(LogInRequest request);
-    LoginResponse refreshAccessToken(String refreshToken);
+    LoginResult performLogin(LogInRequest request);
+    LoginResult refreshAccessToken(String refreshToken);
     String generateRefreshToken(String email);
 }

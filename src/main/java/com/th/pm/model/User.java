@@ -73,4 +73,16 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Token> refreshTokens;
+
+    public void addToken(Token token){
+        this.refreshTokens.add(token);
+    }
+
+    public void removeToken(Token tokenToRemove){
+        for(int i=0; i<refreshTokens.size(); i++){
+            if(refreshTokens.get(i).equals(tokenToRemove)){
+                refreshTokens.remove(i);
+            }
+        }
+    }
 }

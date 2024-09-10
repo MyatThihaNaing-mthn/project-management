@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.th.pm.dto.LogInRequest;
-import com.th.pm.dto.LoginResponse;
+import com.th.pm.dto.LoginResult;
 import com.th.pm.dto.UserDto;
 import com.th.pm.dto.UserRegister;
 import com.th.pm.service.AuthService;
@@ -43,24 +43,28 @@ public class AuthController {
     }
 
     @PostMapping("/user/login")
-    ResponseEntity<LoginResponse> loginUser(
+    ResponseEntity<UserDto> loginUser(
         @RequestBody LogInRequest request,
         HttpServletResponse servletResponse
     ){
         //TODO validation for login
-        LoginResponse response = authService.performLogin(request);
-        String refreshToken = authService.generateRefreshToken(request.getEmail());
-        setRefreshTokenOnResponse( servletResponse, refreshToken);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        LoginResult result = authService.performLogin(request);
+        
+        setRefreshTokenOnResponse( servletResponse, result.getRefreshToken());
+        setAccessTokenOnResponse(servletResponse, result.getAccessToken());
+        return new ResponseEntity<>(result.getUser(), HttpStatus.OK);
     }
 
     @GetMapping("/refresh-token")
-    ResponseEntity<LoginResponse> refreshAccessToken(HttpServletRequest request,
+    ResponseEntity<UserDto> refreshAccessToken(HttpServletRequest request,
     HttpServletResponse response){
-        log.info("Inside refresh endpoint");
         String refreshToken = getRefreshTokenFromRequest(request);
-        LoginResponse loginResponse = authService.refreshAccessToken(refreshToken);
-        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+        LoginResult loginResult = authService.refreshAccessToken(refreshToken);
+
+        setRefreshTokenOnResponse(response, loginResult.getRefreshToken());
+        setAccessTokenOnResponse(response, loginResult.getAccessToken());
+        
+        return new ResponseEntity<>(loginResult.getUser(), HttpStatus.OK);
     }
 
     private String getRefreshTokenFromRequest(HttpServletRequest request){
@@ -84,6 +88,14 @@ public class AuthController {
         cookie.setSecure(false);
         cookie.setPath("/");
         response.addCookie(cookie);
+    }
+
+    private void setAccessTokenOnResponse(HttpServletResponse response, String accessToken){
+        Cookie cookie = new Cookie("accessToken", accessToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        response.addCookie(cookie); 
     }
         
 }

@@ -3,7 +3,8 @@ package com.th.pm.dto;
 import lombok.Data;
 
 @Data
-public class LoginResponse{
+public class TokenDto {
+    private String id;
+    private String token;
     private UserDto user;
-    private String accessToken;
 }
