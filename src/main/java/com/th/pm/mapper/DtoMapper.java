@@ -2,12 +2,12 @@ package com.th.pm.mapper;
 
 import java.util.stream.Collectors;
 import com.th.pm.dto.CommentDto;
-import com.th.pm.dto.ProjectDto;
+import com.th.pm.dto.BoardDto;
 import com.th.pm.dto.TaskDto;
 import com.th.pm.dto.TokenDto;
 import com.th.pm.dto.UserDto;
 import com.th.pm.model.Comment;
-import com.th.pm.model.Project;
+import com.th.pm.model.Board;
 import com.th.pm.model.Task;
 import com.th.pm.model.Token;
 import com.th.pm.model.User;
@@ -31,22 +31,22 @@ public class DtoMapper {
         taskDto.setPriority(task.getStatus().toString());
         taskDto.setCreatedBy(mapToUserDto(task.getCreatedBy()));
         taskDto.setDeadline(task.getDeadline());
-        taskDto.setProjectBelonged(mapToProjectDto(task.getProject()));
-        taskDto.setAssignees(task.getUsers().stream().map(user -> DtoMapper.mapToUserDto(user)).collect(Collectors.toSet()));
+        taskDto.setBoardBelonged(mapToBoardDto(task.getBoard()));
+        taskDto.setAssignees(task.getAssignees().stream().map(user -> DtoMapper.mapToUserDto(user)).collect(Collectors.toSet()));
 
         return taskDto;
     }
 
-    public static ProjectDto mapToProjectDto(Project project){
-        ProjectDto projectDto = new ProjectDto();
-        projectDto.setId(project.getId().toString());
-        projectDto.setTitle(project.getTitle());
-        projectDto.setStatus(project.getStatus().toString());
-        projectDto.setCreatedBy(mapToUserDto(project.getCreatedBy()));
-        projectDto.setMembers(project.getMembers().stream().map(member -> DtoMapper.mapToUserDto(member)).collect(Collectors.toSet()));
-        projectDto.setTasks(project.getTasks().stream().map(task -> DtoMapper.mapToTaskDto(task)).collect(Collectors.toSet()));
+    public static BoardDto mapToBoardDto(Board board){
+        BoardDto boardDto = new BoardDto();
+        boardDto.setId(board.getId().toString());
+        boardDto.setTitle(board.getTitle());
+        boardDto.setStatus(board.getStatus().toString());
+        boardDto.setCreatedBy(mapToUserDto(board.getCreatedBy()));
+        boardDto.setMembers(board.getMembers().stream().map(member -> DtoMapper.mapToUserDto(member)).collect(Collectors.toSet()));
+        boardDto.setTasks(board.getTasks().stream().map(task -> DtoMapper.mapToTaskDto(task)).collect(Collectors.toSet()));
 
-        return projectDto;
+        return boardDto;
     }
 
     public static CommentDto mapToCommentDto(Comment comment){

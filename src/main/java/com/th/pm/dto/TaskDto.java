@@ -14,6 +14,6 @@ public class TaskDto {
     private String status;
     private String priority;
     private UserDto createdBy;
-    private ProjectDto projectBelonged;
+    private BoardDto boardBelonged;
     private Set<UserDto> assignees;
 }

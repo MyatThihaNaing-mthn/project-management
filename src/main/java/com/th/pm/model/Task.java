@@ -19,6 +19,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -59,12 +60,17 @@ public class Task {
     private Instant createdAt;
     
     @ManyToOne
-    @JoinColumn(name = "project_id", nullable = false, updatable = false)
-    private Project project;
+    @JoinColumn(name = "board_id", nullable = false, updatable = false)
+    private Board board;
 
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
-    @ManyToMany(mappedBy = "tasks", fetch = FetchType.LAZY)
-    private Set<User> users;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "task_assigne",
+        joinColumns = @JoinColumn(name = "task_id"),
+        inverseJoinColumns = @JoinColumn(name = "assignee_id")
+    )
+    private Set<User> assignees;
 }

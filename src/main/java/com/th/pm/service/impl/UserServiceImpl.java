@@ -12,7 +12,7 @@ import com.th.pm.dto.UserDto;
 import com.th.pm.dto.UserRegister;
 import com.th.pm.exceptions.EntityNotFoundException;
 import com.th.pm.mapper.DtoMapper;
-import com.th.pm.model.Project;
+import com.th.pm.model.Board;
 import com.th.pm.model.Task;
 import com.th.pm.model.User;
 import com.th.pm.repository.UserRepository;
@@ -38,8 +38,8 @@ public class UserServiceImpl implements UserService {
         String encodedPassword = passwordEncoder.encode(userRegister.getPassword());
         user.setPassword(encodedPassword);
         user.setProfileImageUrl("fakeurl");
-        user.setProjects(new HashSet<Project>());
-        user.setTasks(new HashSet<Task>());
+        user.setBoards(new HashSet<Board>());
+        user.setAssignedTask(new HashSet<Task>());
 
         User savedUser = userRepository.save(user);
 

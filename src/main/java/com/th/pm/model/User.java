@@ -52,27 +52,34 @@ public class User {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
-    
-    @ManyToMany
-    @JoinTable(
-        name = "user_projects",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "project_id"),
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "project_id"})
-    )
-    private Set<Project> projects;
 
     @ManyToMany
     @JoinTable(
-        name = "user_task",
+        name = "user_workspace",
         joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "task_id"),
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "task_id"})
+        inverseJoinColumns = @JoinColumn(name = "workspace_id"),
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "workspace_id"})
     )
-    private Set<Task> tasks;
+    private Set<WorkSpace> belongedWorkspaces;
+
+    @OneToMany(mappedBy = "createdBy")
+    private Set<WorkSpace> creatredWorkSpaces;
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_board",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "board_id")
+    )
+    private Set<Board> boards;
+
+    @ManyToMany(mappedBy = "assignees")
+    private Set<Task> assignedTask;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Token> refreshTokens;
+
+   
 
     public void addToken(Token token){
         this.refreshTokens.add(token);

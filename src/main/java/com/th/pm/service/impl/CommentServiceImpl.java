@@ -39,7 +39,7 @@ public class CommentServiceImpl implements CommentService{
     public CommentDto createComment(CommentRequest request, String userId, String taskId) {
         Task task = validateTask(taskId);
         User user = validateUserForComment(userId);
-        if(!task.getUsers().contains(user)){
+        if(!task.getAssignees().contains(user)){
             log.error("Unauthoirzed operation to comment by user"+userId);
             throw new AccessDeniedException("You are not authorized to perform this operation");
         }
@@ -83,7 +83,7 @@ public class CommentServiceImpl implements CommentService{
         Comment parentComment = validateComment(commentId);
         User user = validateUserForComment(userId);
         Task task = validateTask(parentComment.getTask().getId().toString());
-        if(!task.getUsers().contains(user)){
+        if(!task.getAssignees().contains(user)){
             log.error("Access denied for user "+userId+ "to comment on"+ commentId);
             throw new AccessDeniedException("You are not authorized to comment");
         }
