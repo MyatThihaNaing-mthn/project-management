@@ -59,7 +59,7 @@ public class TaskServiceImpl implements TaskService{
         task.setBoard(board);
         task.setCreatedBy(user);
         task.setComments(new ArrayList<Comment>());
-        task.setUsers(users);
+        task.setAssignees(users);
 
         try{
             Task savedTask = taskRepository.save(task);
@@ -106,7 +106,7 @@ public class TaskServiceImpl implements TaskService{
         User assignee = validateUser(assigneeId, board);
         Task task = validateTask(taskId);
 
-        Set<User> users = task.getUsers();
+        Set<User> users = task.getAssignees();
         users.add(assignee);
         try{
             Task updatedTask = taskRepository.save(task);
@@ -132,7 +132,7 @@ public class TaskServiceImpl implements TaskService{
             log.error("Unauthorized operation by "+taskCreatorId+" to remove user from task");
             throw new AccessDeniedException("You are not authorized to perform this operation");
         }
-        Set<User> members = task.getUsers();
+        Set<User> members = task.getAssignees();
         if (members.contains(taskMember)) {
             members.remove(taskMember);
             try{
@@ -219,7 +219,7 @@ public class TaskServiceImpl implements TaskService{
             log.error("Task not found with Id "+taskId);
             throw new EntityNotFoundException("Task not found ");
         }
-        Set<User> assignees = task.get().getUsers();
+        Set<User> assignees = task.get().getAssignees();
         if (assignees.contains(user)) {
             return task.get();
         }
